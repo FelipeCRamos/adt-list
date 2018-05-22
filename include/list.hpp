@@ -1,5 +1,4 @@
-#ifndef _LIST_HPP_
-#define _LIST_HPP_
+#ifndef _LIST_HPP_ #define _LIST_HPP_
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -143,13 +142,16 @@ namespace sc
 		/* Constructors, Destructors and Assignment {{{*/
 			/** Default constructor that creates an empty list. */
 
+			void init();
+
 			list(  );
 
 			/** Constructs the list with `count` default-inserted instances. */		
 			explicit list( size_type count );
 
 			/** Constructs the list with the contents of the range [first, last). */	
-			list( T first, T last );
+			template <class InitIt>
+			list( InitIt first, InitIt last );
 
 			/** Copy constructor. Constructs the list with the deep copy of other. */
 			list( const list &other );
@@ -226,7 +228,8 @@ namespace sc
 			iterator insert( list::iterator, const T & );
 
 			/** Inserts elements from the range [first, last) before position given. */
-			iterator insert( list::iterator, T, T );
+			template <class InitIt>
+			iterator insert( list::iterator, InitIt, InitIt );
 
 			/** Inserts elements from the initializer list before position given. */
 			iterator insert( list::const_iterator , std::initializer_list<T> );
@@ -235,7 +238,7 @@ namespace sc
 			iterator erase( list::iterator );
 
 			/** Removes the object(s) on the range [first, last). */
-			iterator erase( list::iterator, list::iterator last );
+			iterator erase( list::iterator, list::iterator );
 
 			/** Replaces the contents of the list with copies of the elements
 			 * in the range [first, last).*/
@@ -453,43 +456,62 @@ namespace sc
 
 /* Constructors, Destructors and Assignment sources {{{*/
 	template <class T>
-	list<T>::list(){
+	void list<T>::init(){
 /* Function implementation {{{*/
 		this->m_size = 0;
 		this->m_head = new Node();
 		this->m_tail = new Node();
 		this->m_head->next = m_tail;
 		this->m_tail->prev = m_head;
-	}
+		if( debug_state ) std::cout << ">> Init given with success!!" << std::endl;
+	 }
 /*}}}*/
-	
-	template <class T>
-	list<T>::list( size_type count ){								// TODO
-/* Function implementation {{{*/
 
+	template <class T>
+	list<T>::list(){
+/* Function implementation {{{*/
+		init();
 	}
 /*}}}*/
 	
 	template <class T>
-	list<T>::list( T first, T last ){								// TODO
+	list<T>::list( size_type count ){
 /* Function implementation {{{*/
-		
+		init();
+		for( auto i = 0; i < count; i++ ){
+			push_back(0);
+		}
 	}
 /*}}}*/
 	
 	template <class T>
-	list<T>::list( const list &other ){								// TODO
-/* Function implementation {{{*/
-			
+	template <class InitIt>
+	list<T>::list( InitIt first, InitIt last ){
+	/* Function implementation {{{*/
+		init();
+		insert( begin(), first, last );
 	}
-/*}}}*/
+	/*}}}*/
 	
 	template <class T>
-	list<T>::list( std::initializer_list<T> ilist ){				// TODO
-/* Function implementation {{{*/
-		
+	list<T>::list( const list &other ){
+	/* Function implementation {{{*/
+		init();
+		for( auto i = other.cbegin(); i != other.cend(); i++ ){
+			push_back(*i);
+		}
 	}
-/*}}}*/
+	/*}}}*/
+	
+	template <class T>
+	list<T>::list( std::initializer_list<T> ilist ){
+	/* Function implementation {{{*/
+		init();
+		for( auto &i : ilist ){
+			push_back(i);
+		}
+	}
+	/*}}}*/
 	
 	template <class T>
 	list<T>::~list(){
@@ -508,18 +530,28 @@ namespace sc
 	/*}}}*/
 	
 	template <class T>
-	list<T> &list<T>::operator=( const list &other ){				// TODO
-/* Function implementation {{{*/
-		
+	list<T> &list<T>::operator=( const list &other ){
+	/* Function implementation {{{*/
+		clear();
+		init();
+		for( auto i = other.cbegin(); i != other.cend(); i++ ){
+			push_back(*i);
+		}
+		return *this;
 	}
-/*}}}*/
+	/*}}}*/
 
 	template <class T>
-	list<T> &list<T>::operator=( std::initializer_list<T> ilist ){	// TODO
-/* Function implementation {{{*/
-		
+	list<T> &list<T>::operator=( std::initializer_list<T> ilist ){
+	/* Function implementation {{{*/
+		clear();
+		init();
+		for( auto &i : ilist ){
+			push_back(i);
+		}
+		return *this;
 	}
-/*}}}*/
+	/*}}}*/
 
 /*}}}*/
 
@@ -647,19 +679,20 @@ namespace sc
 	/*}}}*/
 
 	template <class T>
+	template <class InitIt>
 	typename list<T>::iterator list<T>::insert(	
 			list<T>::iterator pos,
-			T first,
-			T last ){
+			InitIt first,
+			InitIt last ){
 	/* Function implementation {{{*/
-		list<T>::iterator itr;		
+		list<T>::iterator itr(pos);		
 		int size = 0;
 		for( auto i = first; i != last; ++i ){
 			itr = list<T>::insert(pos, *i);
 			size++;
 		}
 		if(itr == begin()) return itr;
-		return itr + size - 1;
+		return itr - size + 1;
 	}
 	/*}}}*/
 
