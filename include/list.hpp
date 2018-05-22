@@ -138,10 +138,6 @@ namespace sc
 			/** A constant iterator to the end of the list */
 			const_iterator cend() const;
 
-			iterator erase( list::iterator );
-
-			iterator erase( list::iterator first, list::iterator last );
-			
 		/*}}}*/
 
 		/* Constructors, Destructors and Assignment {{{*/
@@ -222,6 +218,35 @@ namespace sc
 			 * \return 	True if they're not equal, false otherwise. */
 			bool operator!=( const list &rhs );
 		/*}}}*/
+
+		/* List container operations that require iterators {{{*/
+
+
+			/** Adds value into the list before the position given */
+			iterator insert( list::iterator, const T & );
+
+			/** Inserts elements from the range [first, last) before position given. */
+			iterator insert( list::iterator, T, T );
+
+			/** Inserts elements from the initializer list before position given. */
+			iterator insert( list::const_iterator , std::initializer_list<T> );
+
+			/** Removes the object at position pos. */
+			iterator erase( list::iterator );
+
+			/** Removes the object(s) on the range [first, last). */
+			iterator erase( list::iterator, list::iterator last );
+
+			/** Replaces the contents of the list with copies of the elements
+			 * in the range [first, last).*/
+			void assign( T, T );
+
+			/** Replaces the contents of the list with elements from the
+			 * initializer list `ilist`. */
+			void assign( std::initializer_list<T> );
+
+		/*}}}*/
+
 		};
 
 /* Source code {{{*/
@@ -423,32 +448,7 @@ namespace sc
 		return sc::list<T>::const_iterator(this->m_tail);
 	}
 /*}}}*/
-
-	template <class T>
-	typename list<T>::iterator list<T>::erase( list::iterator pos ){
-/* Function implementation {{{*/
-		auto ret = list<T>::iterator(pos.current->next);
-		if( pos != end() ){
-			pos.current->next->prev = pos.current->prev;
-			pos.current->prev->next = pos.current->next;
-			delete pos.current;
-		}
-		m_size--;
-		return ret;
-	}
-/*}}}*/
-
-	template <class T>
-	typename list<T>::iterator list<T>::erase( list<T>::iterator first, list<T>::iterator last ){
-	/* Function implementation {{{*/
-		list<T>::iterator itr = erase(first);
-		while( itr != last ){
-			itr = erase(itr);
-		}
-		return itr;
-	}
-	/*}}}*/
-		
+	
 /*}}}*/
 
 /* Constructors, Destructors and Assignment sources {{{*/
@@ -464,28 +464,28 @@ namespace sc
 /*}}}*/
 	
 	template <class T>
-	list<T>::list( size_type count ){
+	list<T>::list( size_type count ){								// TODO
 /* Function implementation {{{*/
 
 	}
 /*}}}*/
 	
 	template <class T>
-	list<T>::list( T first, T last ){
+	list<T>::list( T first, T last ){								// TODO
 /* Function implementation {{{*/
 		
 	}
 /*}}}*/
 	
 	template <class T>
-	list<T>::list( const list &other ){
+	list<T>::list( const list &other ){								// TODO
 /* Function implementation {{{*/
 			
 	}
 /*}}}*/
 	
 	template <class T>
-	list<T>::list( std::initializer_list<T> ilist ){
+	list<T>::list( std::initializer_list<T> ilist ){				// TODO
 /* Function implementation {{{*/
 		
 	}
@@ -508,18 +508,19 @@ namespace sc
 	/*}}}*/
 	
 	template <class T>
-	list<T> &list<T>::operator=( const list &other ){
+	list<T> &list<T>::operator=( const list &other ){				// TODO
 /* Function implementation {{{*/
 		
 	}
 /*}}}*/
 
 	template <class T>
-	list<T> &list<T>::operator=( std::initializer_list<T> ilist ){
+	list<T> &list<T>::operator=( std::initializer_list<T> ilist ){	// TODO
 /* Function implementation {{{*/
 		
 	}
 /*}}}*/
+
 /*}}}*/
 
 /* Common operations to all list implementations sources {{{*/
@@ -534,6 +535,7 @@ namespace sc
 	void list<T>::clear(){
 /* Function implementation {{{*/
 		erase(begin(), end());
+		this->m_size = 0;
 	}
 /*}}}*/
 
@@ -568,7 +570,7 @@ namespace sc
 /*}}}*/
 
 	template <class T>
-	void list<T>::pop_back(){
+	void list<T>::pop_back(){										// TODO
 /* Function implementation {{{*/
 		// TODO
 	}
@@ -577,26 +579,32 @@ namespace sc
 	template <class T>
 	void list<T>::pop_front(){
 /* Function implementation {{{*/
-		// TODO
+		if( empty() ){
+			// TODO: Throw exception
+		}
+		return this->m_head->next->data;
 	}
 /*}}}*/
 
 	template <class T>
 	const T &list<T>::back() const{
+	/* Function implementation {{{*/
+		if( empty() ){
+			// TODO: Throw exception
+		}
+		return this->m_tail->prev->data;
+	}
+	/*}}}*/
+
+	template <class T>
+	const T &list<T>::front() const{								// TODO
 /* Function implementation {{{*/
 		// TODO
 	}
 /*}}}*/
 
 	template <class T>
-	const T &list<T>::front() const{
-/* Function implementation {{{*/
-		// TODO
-	}
-/*}}}*/
-
-	template <class T>
-	void list<T>::assign( const T &value ){
+	void list<T>::assign( const T &value ){							// TODO
 /* Function implementation {{{*/
 		// TODO
 	}
@@ -607,20 +615,115 @@ namespace sc
 /* Operator overloading -- Non-member functions {{{*/
 
 	template <class T>
-	bool list<T>::operator==( const list &rhs ){
+	bool list<T>::operator==( const list &rhs ){					// TODO
 /* Function implementation {{{*/
 		// TODO
 	}
 /*}}}*/
 
 	template <class T>
-	bool list<T>::operator!=( const list &rhs ){
+	bool list<T>::operator!=( const list &rhs ){					// TODO
 /* Function implementation {{{*/
 		// TODO
 	}
 /*}}}*/
 
 /*}}}*/
+
+/* List container operations sources {{{*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::insert(	
+			list<T>::iterator pos,
+			const T &value ){
+	/* Function implementation {{{*/
+		typename list<T>::Node* inserted =
+			new typename list<T>::Node(value, pos.current->prev, pos.current);
+		m_size++;
+		pos.current->prev->next = inserted;
+		pos.current->prev = inserted;
+		return inserted;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::insert(	
+			list<T>::iterator pos,
+			T first,
+			T last ){
+	/* Function implementation {{{*/
+		list<T>::iterator itr;		
+		int size = 0;
+		for( auto i = first; i != last; ++i ){
+			itr = list<T>::insert(pos, *i);
+			size++;
+		}
+		if(itr == begin()) return itr;
+		return itr + size - 1;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::insert(	
+			list<T>::const_iterator pos,
+			std::initializer_list<T> ilist ){
+	/* Function implementation {{{*/
+		list<T>::iterator itr;	
+		for( auto i = ilist.begin(); i < ilist.end(); ++i ){
+			itr = list<T>::insert(pos, *i);
+		}
+		if( itr == begin() ) return itr;
+		int size = ilist.size();
+		return itr - size + 1;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::erase( list::iterator pos ){
+/* Function implementation {{{*/
+		auto ret = list<T>::iterator(pos.current->next);
+		if( pos != end() ){
+			pos.current->next->prev = pos.current->prev;
+			pos.current->prev->next = pos.current->next;
+			delete pos.current;
+		}
+		m_size--;
+		return ret;
+	}
+/*}}}*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::erase( list<T>::iterator first, list<T>::iterator last ){
+	/* Function implementation {{{*/
+		list<T>::iterator itr = erase(first);
+		while( itr != last ){
+			itr = erase(itr);
+		}
+		return itr;
+	}
+	/*}}}*/
+
+	template <class T>
+	void list<T>::assign( T first, T last ){
+	/* Function implementation {{{*/
+		if( this->m_size != 0 ){
+			list<T>::clear();
+		}	
+		insert(begin(), first, last);
+	}
+	/*}}}*/
+
+	template <class T>
+	void list<T>::assign( std::initializer_list<T> ilist ){	
+	/* Function implementation {{{*/
+		if( this->m_size != 0 ) list<T>::clear();	
+		insert(begin(), ilist.begin(), ilist.end());
+	}
+	/*}}}*/
+
+
+/*}}}*/
+
 /*}}}*/
 
 }
