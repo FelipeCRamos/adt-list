@@ -1,72 +1,160 @@
 #ifndef _LIST_HPP_
 #define _LIST_HPP_
+#include <iostream>
+#include <cmath>
+#include <algorithm>
 
 #define debug_state false
 
+/*
+ * 	\file	list.hpp
+ * 	\author	Felipe Ramos
+ */
 
 using size_type = size_t;
+using value_type = int;
 
 namespace sc
 {
-	<template T>
+	/** Consists in the implementation of a double linked list using classes. */
+	template <class T>
 		class list{
 		private:
+			/** Contains nodes previous/next adresses, and it's data. */
 			struct Node {
 				T data;
 				Node *prev;
 				Node *next;
+				Node( T d = T(), Node *p = nullptr, Node *n = nullptr ):
+					data(d), prev(p), next(n){}
 			};
 
-			int m_size;
-			Node *m_head;
-			Node *m_tail;
+			size_type m_size;			//!< Total size of the list
+			Node *m_head;				//!< Head node of the list
+			Node *m_tail;				//!< Tail node of the list
 		public:
 		/* Iterators {{{*/
-			class iterator{
-			private:
-				T *m_ptr;
-			public:
-				// Constructors 
-				iterator( T *ptr = nullptr );
-				iterator( const iterator & );
-
-				// Destructors
-				~iterator(  );
-
-				// Operators
-				iterator &operator=( const iterator & );
-				T &operator*(  ) const;
-
-				iterator operator++(  );			//!< ++it
-				iterator operator++( size_type );	//!< it++
-				iterator operator--(  );			//!< --it
-				iterator operator--( size_type );	//!< it--
-				iterator operator+( size_type );	//!< ptr - size_type
-				iterator operator-( size_type );	//!< ptr + size_type
-
-				bool operator==( const iterator & ) const;
-				bool operator!=( const iterator & ) const;
-			}
+			/** A simple const_iterator class */
 			class const_iterator{
-			private:
-				T *m_ptr;
-			}
+/* Declaration {{{*/
+				public:
+					/** Default const_iterator initializer */
+					const_iterator() = default;
+
+					/** Default const_iterator dereferencier */
+					const T &operator*() const;
+
+					/** Overload on the ++it operator */
+					const_iterator &operator++();
+
+					/** Overload on the it++ operator */
+					const_iterator operator++( value_type );
+
+					/** Overload on the --it operator */
+					const_iterator &operator--();
+
+					/** Overload on the it-- operator */
+					const_iterator operator--( value_type );
+
+					/** Overload on the it - value operator */
+					const_iterator &operator-( value_type );
+
+					/** Overload on the it + value operator */
+					const_iterator &operator+( value_type );
+
+					/** Overload on the == operator */
+					bool operator==( const const_iterator & ) const;
+
+					/** Overload on the != operator */
+					bool operator!=( const const_iterator & ) const;
+
+				protected:
+					/** Current Node that the iterator is on */
+					Node *current;
+
+					/** Initialize the const_iterator to a Node */
+					const_iterator( Node *p ): current(p){}
+
+					/** Get's access to list<T> methods */
+					friend class list<T>;
+			};
+/*}}}*/
+
+			/** A simple iterator class */
+			class iterator: public const_iterator{
+			/* Declaration {{{*/
+				public:
+
+					/** Default initializes the iterator() with const_iterator() methods */
+					iterator() : const_iterator(){}
+
+					/** Default desreferencier of the iterator class */
+					const T &operator*() const;
+					// T &operator*();
+
+					/** Overload on the ++it operator */
+					iterator &operator++();
+
+					/** Overload on the it++ operator */
+					iterator operator++( value_type );
+
+					/** Overload on the --it operator */
+					iterator &operator--();
+
+					/** Overload on the it-- operator */
+					iterator operator--( value_type );
+
+					/** Overload on the it - value operator */
+					iterator &operator-( value_type );
+
+					/** Overload on the it + value operator */
+					iterator &operator+( value_type );
+
+					/** Overload on the == operator */
+					bool operator==( const iterator & ) const;
+
+					/** Overload on the != operator */
+					bool operator!=( const iterator & ) const;
+
+
+				protected:
+					/** Default initializes the iterator with a node */
+					iterator( Node *p ): const_iterator(p) {}
+
+					/** Get's access to all list<T> methods */
+					friend class list<T>;
+			};
+			/*}}}*/
+
+			/** A normal iterator to the begin of the list */
+			iterator begin();
+
+			/** A normal iterator to the end of the list */
+			iterator end();
+
+			/** A constant iterator to the begin of the list */
+			const_iterator cbegin() const;
+
+			/** A constant iterator to the end of the list */
+			const_iterator cend() const;
+			
 		/*}}}*/
+
 		/* Constructors, Destructors and Assignment {{{*/
-			/** Default constructor that creates an empty list */
+			/** Default constructor that creates an empty list. */
+
 			list(  );
 
-			/** Constructs the list with `count` default-inserted instances */		
+			/** Constructs the list with `count` default-inserted instances. */		
 			explicit list( size_type count );
 
-			/** Constructs the list with the contents of the range [first, last) */	
-			template< class InputIt >
-			list( InputIt first, InputIt last );
+			/** Constructs the list with the contents of the range [first, last). */	
+			list( T first, T last );
 
-			/** Copy constructor. Constructs the list with the deep copy of other */
+			/** Copy constructor. Constructs the list with the deep copy of other. */
 			list( const list &other );
 
-			/** Constructs the list with the contents of the initializer list ilist */
+			/** Constructs the list with the contents of the initializer list ilist. */
 			list( std::initializer_list<T> ilist );
 
 			/** Destructs the list  */
@@ -80,45 +168,232 @@ namespace sc
 		/*}}}*/
 
 		/* Common operations to all list implementations {{{*/
-			/** Return the number of elements in the container */
+			/** Return the number of elements in the container. */
 			size_type size(  ) const;	
 			
-			/** Remove (either logically or physically) all elements */
+			/** Remove (either logically or physically) all elements. */
 			void clear(  );
 
-			/** Returns `true` if the container contains no elements */
+			/** Returns `true` if the container contains no elements. */
 			bool empty(  );
 
-			/** Adds `value` to the front of the list */
+			/** Adds `value` to the front of the list. 
+			 * \param 	const T &value : Whatever we want to add to the end of a
+			 * list, must followup with list's class.
+			 */
 			void push_front( const T &value );
 
-			/** Adds `value` to the end of the list */
+			/** Adds `value` to the end of the list.
+			 * \param const T &value : Whatever we want to add to the beggining
+			 * of the list, must follow-up with list's class.
+			 */
 			void push_back( const T &value );
 
-			/** Removes the object at the end of the list */
+			/** Removes the object at the end of the list. */
 			void pop_back(  );
 
-			/** Removes the object at the front of the list */
+			/** Removes the object at the front of the list. */
 			void pop_front(  );
 
-			/** Returns the object at the end of the list */
+			/** Returns the object at the end of the list. */
 			const T &back(  ) const;
 
-			/** Returns the object at the beginning of the list */
+			/** Returns the object at the beginning of the list. */
 			const T &front(  ) const;
 
-			/** Replaces the content of the list with copies of `value` */
+			/** Replaces the content of the list with copies of `value`. */
 			void assign( const T &value );
 		/*}}}*/
 
 		/* Operator overloading -- Non-member functions {{{*/ 
-			/** Checks if contents of lhs and rhs are equal */
-			bool operator==( const list &lhs, const list &rhs );
+			/** Checks if contents of lhs and rhs are equal.
+			 * \param 	const list &rhs : The list that we want to make the
+			 * comparisson.
+			 * \return 	True if they're equal, false otherwise. */
+			bool operator==( const list &rhs );
 
-			/** Checks if contents of lhs and rhs are not equal */
-			bool operator!=( const list &lhs, const list &rhs );
+			/** Checks if contents of lhs and rhs are not equal.
+			 * \param 	const list &rhs : The list that we want to make the
+			 * comparisson.
+			 * \return 	True if they're not equal, false otherwise. */
+			bool operator!=( const list &rhs );
 		/*}}}*/
+		};
+
+/* Source code {{{*/
+/* Iterators sources {{{*/
+	template <class T>
+	typename sc::list<T>::iterator sc::list<T>::begin(){
+/* Function implementation {{{*/
+		return sc::list<T>::iterator(this->m_head->next);
+	}
+/*}}}*/
+		
+/*}}}*/
+
+/* Constructors, Destructors and Assignment sources {{{*/
+	template <class T>
+	list<T>::list(){
+/* Function implementation {{{*/
+		this->m_size = 0;
+		this->m_head = new Node();
+		this->m_tail = new Node();
+		this->m_head->next = m_tail;
+		this->m_tail->prev = m_head;
+	}
+/*}}}*/
+	
+	template <class T>
+	list<T>::list( size_type count ){
+/* Function implementation {{{*/
+
+	}
+/*}}}*/
+	
+	template <class T>
+	list<T>::list( T first, T last ){
+/* Function implementation {{{*/
+		
+	}
+/*}}}*/
+	
+	template <class T>
+	list<T>::list( const list &other ){
+/* Function implementation {{{*/
+		
+	}
+/*}}}*/
+	
+	template <class T>
+	list<T>::list( std::initializer_list<T> ilist ){
+/* Function implementation {{{*/
+		
+	}
+/*}}}*/
+	
+	template <class T>
+	list<T>::~list(){
+/* Function implementation {{{*/
+		Node *temp = this->m_head;	
+		while( temp != this->m_tail ){
+			temp = temp->next;
+			if(temp->prev != this->m_head){
+				delete temp->prev;
+			}
 		}
+
+		delete this->m_head;
+		delete this->m_tail;
+	}
+/*}}}*/
+	
+	template <class T>
+	list<T> &list<T>::operator=( const list &other ){
+/* Function implementation {{{*/
+		
+	}
+/*}}}*/
+
+	template <class T>
+	list<T> &list<T>::operator=( std::initializer_list<T> ilist ){
+/* Function implementation {{{*/
+		
+	}
+/*}}}*/
+/*}}}*/
+
+/* Common operations to all list implementations sources {{{*/
+	template <class T>
+	size_type list<T>::size() const{
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	void list<T>::clear(){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	bool list<T>::empty(){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	void list<T>::push_front( const T &value ){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	void list<T>::push_back( const T &value ){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	void list<T>::pop_back(){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	void list<T>::pop_front(){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	const T &list<T>::back() const{
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	const T &list<T>::front() const{
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	void list<T>::assign( const T &value ){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+/*}}}*/
+
+/* Operator overloading -- Non-member functions {{{*/
+
+	template <class T>
+	bool list<T>::operator==( const list &rhs ){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+	template <class T>
+	bool list<T>::operator!=( const list &rhs ){
+/* Function implementation {{{*/
+		// TODO
+	}
+/*}}}*/
+
+/*}}}*/
+/*}}}*/
+
 }
 
 #endif
