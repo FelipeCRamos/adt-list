@@ -137,6 +137,10 @@ namespace sc
 
 			/** A constant iterator to the end of the list */
 			const_iterator cend() const;
+
+			iterator erase( list::iterator );
+
+			iterator erase( list::iterator first, list::iterator last );
 			
 		/*}}}*/
 
@@ -222,12 +226,228 @@ namespace sc
 
 /* Source code {{{*/
 /* Iterators sources {{{*/
+
+/* const_iterator sources {{{*/
+	// TODO: Make const_iterator a real const_iterator
+	template <class T>
+	const T &sc::list<T>::const_iterator::operator*() const{
+	/* Function implementation {{{*/
+		return this->current->data;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::const_iterator &sc::list<T>::const_iterator::operator++(){
+	/* Function implementation {{{*/
+		this->current = this->current->next;
+		return *this;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::const_iterator sc::list<T>::const_iterator::operator++( value_type ){
+	/* Function implementation {{{*/
+		auto copy = *this;
+		this->current = this->current->next;
+		return copy;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::const_iterator &sc::list<T>::const_iterator::operator--(){
+	/* Function implementation {{{*/
+		this->current = this->current->prev;
+		return *this;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::const_iterator sc::list<T>::const_iterator::operator--( value_type ){
+	/* Function implementation {{{*/
+		auto copy = *this;
+		this->current = this->current->prev;
+		return copy;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::const_iterator &sc::list<T>::const_iterator::operator+( value_type add ){
+	/* Function implementation {{{*/
+		for( int i = 0; i < add; ++i ){
+			if( this->current == nullptr ){
+				// TODO: Throw exp
+			}
+			this->current = this->current->next;
+		}
+		return *this;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::const_iterator &sc::list<T>::const_iterator::operator-( value_type sub ){
+/* Function implementation {{{*/
+		for( int i = 0; i < sub; ++i ){
+			if( this->current == nullptr ){
+				// TODO: Throw exp
+			}
+			this->current = this->current->prev;
+		}
+		return *this;
+	}
+/*}}}*/
+
+	template <class T>
+	bool sc::list<T>::const_iterator::operator==( const const_iterator &rhs ) const{
+	/* Function implementation {{{*/
+		return this->current == rhs.current;
+	}
+	/*}}}*/
+
+	template <class T>
+	bool sc::list<T>::const_iterator::operator!=( const const_iterator &rhs ) const{
+	/* Function implementation {{{*/
+		return this->current != rhs.current;
+	}
+	/*}}}*/
+	/*}}}*/
+
+/* iterator sources {{{*/
+	template <class T>
+	const T &sc::list<T>::iterator::operator*() const{
+	/* Function implementation {{{*/
+		return this->current->data;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::iterator &sc::list<T>::iterator::operator++(){
+	/* Function implementation {{{*/
+		this->current = this->current->next;
+		return *this;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::iterator sc::list<T>::iterator::operator++( value_type ){
+	/* Function implementation {{{*/
+		auto copy = *this;
+		this->current = this->current->next;
+		return copy;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::iterator &sc::list<T>::iterator::operator--(){
+	/* Function implementation {{{*/
+		this->current = this->current->prev;
+		return *this;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::iterator sc::list<T>::iterator::operator--( value_type ){
+	/* Function implementation {{{*/
+		auto copy = *this;
+		this->current = this->current->prev;
+		return copy;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::iterator &sc::list<T>::iterator::operator+( value_type add ){
+	/* Function implementation {{{*/
+		for( int i = 0; i < add; ++i ){
+			if( this->current == nullptr ){
+				// TODO: Throw exp
+			}
+			this->current = this->current->next;
+		}
+		return *this;
+	}
+	/*}}}*/
+
+	template <class T>
+	typename sc::list<T>::iterator &sc::list<T>::iterator::operator-( value_type sub ){
+/* Function implementation {{{*/
+		for( int i = 0; i < sub; ++i ){
+			if( this->current == nullptr ){
+				// TODO: Throw exp
+			}
+			this->current = this->current->prev;
+		}
+		return *this;
+	}
+/*}}}*/
+
+	template <class T>
+	bool sc::list<T>::iterator::operator==( const iterator &rhs ) const{
+	/* Function implementation {{{*/
+		return this->current == rhs.current;
+	}
+	/*}}}*/
+
+	template <class T>
+	bool sc::list<T>::iterator::operator!=( const iterator &rhs ) const{
+	/* Function implementation {{{*/
+		return this->current != rhs.current;
+	}
+	/*}}}*/
+/*}}}*/
+
+//=============================================================================
+
 	template <class T>
 	typename sc::list<T>::iterator sc::list<T>::begin(){
 /* Function implementation {{{*/
 		return sc::list<T>::iterator(this->m_head->next);
 	}
 /*}}}*/
+		
+	template <class T>
+	typename sc::list<T>::iterator sc::list<T>::end(){
+/* Function implementation {{{*/
+		return sc::list<T>::iterator(this->m_tail);
+	}
+/*}}}*/
+		
+	template <class T>
+	typename sc::list<T>::const_iterator sc::list<T>::cbegin() const{
+/* Function implementation {{{*/
+		return sc::list<T>::const_iterator(this->m_head->next);
+	}
+/*}}}*/
+		
+	template <class T>
+	typename sc::list<T>::const_iterator sc::list<T>::cend() const{
+/* Function implementation {{{*/
+		return sc::list<T>::const_iterator(this->m_tail);
+	}
+/*}}}*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::erase( list::iterator pos ){
+/* Function implementation {{{*/
+		auto ret = list<T>::iterator(pos.current->next);
+		if( pos != end() ){
+			pos.current->next->prev = pos.current->prev;
+			pos.current->prev->next = pos.current->next;
+			delete pos.current;
+		}
+		m_size--;
+		return ret;
+	}
+/*}}}*/
+
+	template <class T>
+	typename list<T>::iterator list<T>::erase( list<T>::iterator first, list<T>::iterator last ){
+	/* Function implementation {{{*/
+		list<T>::iterator itr = erase(first);
+		while( itr != last ){
+			itr = erase(itr);
+		}
+		return itr;
+	}
+	/*}}}*/
 		
 /*}}}*/
 
@@ -260,7 +480,7 @@ namespace sc
 	template <class T>
 	list<T>::list( const list &other ){
 /* Function implementation {{{*/
-		
+			
 	}
 /*}}}*/
 	
@@ -273,7 +493,7 @@ namespace sc
 	
 	template <class T>
 	list<T>::~list(){
-/* Function implementation {{{*/
+	/* Function implementation {{{*/
 		Node *temp = this->m_head;	
 		while( temp != this->m_tail ){
 			temp = temp->next;
@@ -285,7 +505,7 @@ namespace sc
 		delete this->m_head;
 		delete this->m_tail;
 	}
-/*}}}*/
+	/*}}}*/
 	
 	template <class T>
 	list<T> &list<T>::operator=( const list &other ){
@@ -306,35 +526,44 @@ namespace sc
 	template <class T>
 	size_type list<T>::size() const{
 /* Function implementation {{{*/
-		// TODO
+		return this->m_size;
 	}
 /*}}}*/
 
 	template <class T>
 	void list<T>::clear(){
 /* Function implementation {{{*/
-		// TODO
+		erase(begin(), end());
 	}
 /*}}}*/
 
 	template <class T>
 	bool list<T>::empty(){
 /* Function implementation {{{*/
-		// TODO
+		// kinda of ambiguos, but necessary check
+		bool cond1 = this->m_head->next == this->m_tail;
+		bool cond2 = this->m_tail->prev == this->m_head;
+		return cond1 and cond2;
 	}
 /*}}}*/
 
 	template <class T>
 	void list<T>::push_front( const T &value ){
 /* Function implementation {{{*/
-		// TODO
+		Node *push = new Node(value, this->m_head, this->m_head->next);
+		this->m_head->next->prev = push;
+		this->m_head->next = push;
+		this->m_size++;
 	}
 /*}}}*/
 
 	template <class T>
 	void list<T>::push_back( const T &value ){
 /* Function implementation {{{*/
-		// TODO
+		Node *push = new Node(value, this->m_tail->prev, this->m_tail);
+		this->m_tail->prev->next = push;
+		this->m_tail->prev = push;
+		this->m_size++;
 	}
 /*}}}*/
 
