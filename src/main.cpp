@@ -6,16 +6,30 @@
 int main( int argc, char **argv ){
 	std::cout << ">> Driver code started sucessfully!" << std::endl;
 	std::cout << ">> Attempting to create a list()..." << std::endl;
-	int Vet[] = { 1, 2, 3 ,4, 8, 8, 8, 8, 8 };
 
-	std::initializer_list<int> mylist;
-	mylist = { 10, 20, 30 };
+	sc::list<int> test = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	sc::list<int> test33 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	
 
-	sc::list<int> test( std::begin(Vet), std::end(Vet) );
-	sc::list<int> test3( mylist );
-	test3 = {3, 2, 5, 10, 22};
-	for (auto &i : test3){
-		std::cout << i << std::endl;
+	sc::list<int> test2 = { 1, 8, 3, 4, 5, 6, 0, 8, 1, 10 };
+
+
+
+	std::cout << "Print teste" << std::endl;
+	for( auto &i : test ){
+		std::cout << i << " ";
 	}
+	std::cout << std::endl;
+
+	// operations here
+	test.pop_front();
+	test.assign(99);
+
+	std::cout << "Segundo Print teste" << std::endl;
+	for( auto &i : test ){
+		std::cout << i << " ";
+	}
+	std::cout << std::endl;
+	
 	return 0;
 }

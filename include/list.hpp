@@ -88,8 +88,7 @@ namespace sc
 					iterator() : const_iterator(){}
 
 					/** Default desreferencier of the iterator class */
-					const T &operator*() const;
-					// T &operator*();
+					T &operator*();
 
 					/** Overload on the ++it operator */
 					iterator &operator++();
@@ -341,7 +340,7 @@ namespace sc
 
 /* iterator sources {{{*/
 	template <class T>
-	const T &sc::list<T>::iterator::operator*() const{
+	T &sc::list<T>::iterator::operator*(){
 	/* Function implementation {{{*/
 		return this->current->data;
 	}
@@ -602,45 +601,41 @@ namespace sc
 /*}}}*/
 
 	template <class T>
-	void list<T>::pop_back(){										// TODO
+	void list<T>::pop_back(){
 /* Function implementation {{{*/
-		// TODO
+		erase( this->m_head->next );
 	}
 /*}}}*/
 
 	template <class T>
 	void list<T>::pop_front(){
 /* Function implementation {{{*/
-		if( empty() ){
-			// TODO: Throw exception
-		}
-		return this->m_head->next->data;
+		erase( this->m_tail->prev );
 	}
 /*}}}*/
 
 	template <class T>
 	const T &list<T>::back() const{
 	/* Function implementation {{{*/
-		if( empty() ){
-			// TODO: Throw exception
-		}
 		return this->m_tail->prev->data;
 	}
 	/*}}}*/
 
 	template <class T>
-	const T &list<T>::front() const{								// TODO
+	const T &list<T>::front() const{
 /* Function implementation {{{*/
-		// TODO
+		return this->m_head->next->data;
 	}
 /*}}}*/
 
 	template <class T>
-	void list<T>::assign( const T &value ){							// TODO
-/* Function implementation {{{*/
-		// TODO
+	void list<T>::assign( const T &value ){
+	/* Function implementation {{{*/
+		for( auto i = begin(); i != end(); i++ ){
+			*i = value;
+		}	
 	}
-/*}}}*/
+	/*}}}*/
 
 /*}}}*/
 
@@ -649,16 +644,21 @@ namespace sc
 	template <class T>
 	bool list<T>::operator==( const list &rhs ){					// TODO
 /* Function implementation {{{*/
-		// TODO
+		if( this->m_size != rhs.m_size ) return false;
+		for( int i = 0; i < m_size; i++ ){
+			if( *(cbegin() + i) != *(rhs.cbegin() + i) ) return false;
+		}
+		return true;
 	}
 /*}}}*/
 
 	template <class T>
 	bool list<T>::operator!=( const list &rhs ){					// TODO
-/* Function implementation {{{*/
-		// TODO
+	/* Function implementation {{{*/
+		if ((*this) == rhs) return false;
+		return true;
 	}
-/*}}}*/
+	/*}}}*/
 
 /*}}}*/
 
