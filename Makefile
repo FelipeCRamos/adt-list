@@ -23,11 +23,14 @@ HEADERS := $(wildcard $(INCDIR)/*)
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
-all: project
+all: project documentation
 
 project: $(OBJECTS) $(HEADERS) | $(BINDIR)
 	$(CC) $(OBJECTS) $(CFLAGS) -o $(BINDIR)/$(PROJ_NAME)
 	@ln -sfv $(BINDIR)/$(PROJ_NAME) $(PROJ_NAME)
+
+documentation:
+	@mkdir -p "Documentation"
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp $(HEADERS) | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -48,6 +51,8 @@ clean_proj:
 	@$(RM) -r $(OBJDIR)
 	@echo "Removing BINDIR..."
 	@$(RM) -r $(BINDIR)
+	@echo "Removing documentation files..."
+	@$(RM) -r Documentation/
 	@echo "Removing symlink..."
 	@$(RM) -f $(PROJ_NAME)
 	@echo "Clean-up completed!"
