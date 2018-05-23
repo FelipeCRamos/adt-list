@@ -1,7 +1,7 @@
-#ifndef _LIST_HPP_ #define _LIST_HPP_
+#ifndef _LIST_HPP_ 
+#define _LIST_HPP_
+
 #include <iostream>
-#include <cmath>
-#include <algorithm>
 
 #define debug_state false
 
@@ -32,6 +32,7 @@ namespace sc
 			Node *m_head;				//!< Head node of the list
 			Node *m_tail;				//!< Tail node of the list
 		public:
+
 		/* Iterators {{{*/
 			/** A simple const_iterator class */
 			class const_iterator{
@@ -143,7 +144,7 @@ namespace sc
 
 			void init();
 
-			list(  );
+			list();
 
 			/** Constructs the list with `count` default-inserted instances. */		
 			explicit list( size_type count );
@@ -252,6 +253,7 @@ namespace sc
 		};
 
 /* Source code {{{*/
+
 /* Iterators sources {{{*/
 
 /* const_iterator sources {{{*/
@@ -462,7 +464,6 @@ namespace sc
 		this->m_tail = new Node();
 		this->m_head->next = m_tail;
 		this->m_tail->prev = m_head;
-		if( debug_state ) std::cout << ">> Init given with success!!" << std::endl;
 	 }
 /*}}}*/
 
@@ -531,11 +532,15 @@ namespace sc
 	template <class T>
 	list<T> &list<T>::operator=( const list &other ){
 	/* Function implementation {{{*/
-		clear();
-		init();
+		if( this->m_size != 0 ){
+			clear();
+			init();
+		}
+
 		for( auto i = other.cbegin(); i != other.cend(); i++ ){
 			push_back(*i);
 		}
+
 		return *this;
 	}
 	/*}}}*/
@@ -543,11 +548,15 @@ namespace sc
 	template <class T>
 	list<T> &list<T>::operator=( std::initializer_list<T> ilist ){
 	/* Function implementation {{{*/
-		clear();
-		init();
+		if( this->m_size != 0 ){
+			clear();
+			init();
+		}
+
 		for( auto &i : ilist ){
 			push_back(i);
 		}
+
 		return *this;
 	}
 	/*}}}*/
@@ -642,7 +651,7 @@ namespace sc
 /* Operator overloading -- Non-member functions {{{*/
 
 	template <class T>
-	bool list<T>::operator==( const list &rhs ){					// TODO
+	bool list<T>::operator==( const list &rhs ){
 /* Function implementation {{{*/
 		if( this->m_size != rhs.m_size ) return false;
 		for( int i = 0; i < m_size; i++ ){
@@ -653,7 +662,7 @@ namespace sc
 /*}}}*/
 
 	template <class T>
-	bool list<T>::operator!=( const list &rhs ){					// TODO
+	bool list<T>::operator!=( const list &rhs ){
 	/* Function implementation {{{*/
 		if ((*this) == rhs) return false;
 		return true;
@@ -686,13 +695,18 @@ namespace sc
 			InitIt last ){
 	/* Function implementation {{{*/
 		list<T>::iterator itr(pos);		
-		int size = 0;
+		unsigned long int size = 0;
+
 		for( auto i = first; i != last; ++i ){
 			itr = list<T>::insert(pos, *i);
 			size++;
 		}
-		if(itr == begin()) return itr;
-		return itr - size + 1;
+
+		if( itr == begin() ){
+			return itr;
+		} else {
+			return itr - size + 1;
+		}
 	}
 	/*}}}*/
 
@@ -702,12 +716,17 @@ namespace sc
 			std::initializer_list<T> ilist ){
 	/* Function implementation {{{*/
 		list<T>::iterator itr;	
+		int size = ilist.size();
+
 		for( auto i = ilist.begin(); i < ilist.end(); ++i ){
 			itr = list<T>::insert(pos, *i);
 		}
-		if( itr == begin() ) return itr;
-		int size = ilist.size();
-		return itr - size + 1;
+
+		if( itr == begin() ){
+			return itr;
+		} else {
+			return itr - size + 1;
+		}
 	}
 	/*}}}*/
 
@@ -715,12 +734,14 @@ namespace sc
 	typename list<T>::iterator list<T>::erase( list::iterator pos ){
 /* Function implementation {{{*/
 		auto ret = list<T>::iterator(pos.current->next);
+
 		if( pos != end() ){
 			pos.current->next->prev = pos.current->prev;
 			pos.current->prev->next = pos.current->next;
 			delete pos.current;
 		}
 		m_size--;
+
 		return ret;
 	}
 /*}}}*/
@@ -729,9 +750,11 @@ namespace sc
 	typename list<T>::iterator list<T>::erase( list<T>::iterator first, list<T>::iterator last ){
 	/* Function implementation {{{*/
 		list<T>::iterator itr = erase(first);
+
 		while( itr != last ){
 			itr = erase(itr);
 		}
+
 		return itr;
 	}
 	/*}}}*/
@@ -739,9 +762,9 @@ namespace sc
 	template <class T>
 	void list<T>::assign( T first, T last ){
 	/* Function implementation {{{*/
-		if( this->m_size != 0 ){
+		if( this->m_size != 0 )
 			list<T>::clear();
-		}	
+
 		insert(begin(), first, last);
 	}
 	/*}}}*/
@@ -749,7 +772,9 @@ namespace sc
 	template <class T>
 	void list<T>::assign( std::initializer_list<T> ilist ){	
 	/* Function implementation {{{*/
-		if( this->m_size != 0 ) list<T>::clear();	
+		if( this->m_size != 0 )
+			list<T>::clear();	
+
 		insert(begin(), ilist.begin(), ilist.end());
 	}
 	/*}}}*/
